@@ -300,6 +300,45 @@ async def process_audio_with_ai(meeting_id: str, audio_file_path: str):
             {"$set": {"status": "error"}}
         )
 
+@api_router.put("/meetings/{meeting_id}")
+async def update_meeting(meeting_id: str, meeting_update: MeetingUpdate):
+    """Update meeting metadata (title, company, participants, date)"""
+    try:
+        # Get meeting
+        meeting = await db.meetings.find_one({"id": meeting_id})
+        if not meeting:
+            raise HTTPException(status_code=404, detail="Meeting not found")
+        
+        # Prepare update data (only include non-None values)
+        update_data = {}
+        if meeting_update.title is not None:
+            update_data["title"] = meeting_update.title
+        if meeting_update.company_name is not None:
+            update_data["company_name"] = meeting_update.company_name
+        if meeting_update.participants is not None:
+            update_data["participants"] = meeting_update.participants
+        if meeting_update.meeting_date is not None:
+            update_data["meeting_date"] = meeting_update.meeting_date
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No fields to update")
+        
+        # Update meeting in database
+        await db.meetings.update_one(
+            {"id": meeting_id},
+            {"$set": update_data}
+        )
+        
+        # Return updated meeting
+        updated_meeting = await db.meetings.find_one({"id": meeting_id})
+        return MeetingRecording(**updated_meeting)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating meeting {meeting_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error updating meeting: {str(e)}")
+
 @api_router.post("/meetings/{meeting_id}/ask-question")
 async def ask_question_about_meeting(meeting_id: str, question_data: QuestionCreate):
     """Ask a question about a meeting and get AI-powered answer based on meeting content"""
