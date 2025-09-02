@@ -500,6 +500,72 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginRight: 12,
   },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  editButton: {
+    padding: 4,
+  },
+  editActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cancelButton: {
+    padding: 8,
+    marginRight: 8,
+  },
+  saveButton: {
+    backgroundColor: '#34C759',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+    minWidth: 40,
+    alignItems: 'center',
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#8E8E93',
+  },
+  meetingInfo: {
+    gap: 12,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  infoText: {
+    fontSize: 16,
+    color: '#E5E5E7',
+    flex: 1,
+  },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  editForm: {
+    gap: 16,
+  },
+  inputGroup: {
+    gap: 6,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#FFFFFF',
+  },
+  textInput: {
+    backgroundColor: '#1C1C1E',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#333333',
+    minHeight: 44,
+  },
   statusBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
