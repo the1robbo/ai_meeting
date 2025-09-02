@@ -802,4 +802,37 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginTop: 4,
   },
+  // Progress Bar Styles
+  progressContainer: {
+    marginTop: 12,
+    paddingHorizontal: 4,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#007AFF',
+    fontWeight: '500',
+  },
+  progressPercentage: {
+    fontSize: 14,
+    color: '#007AFF',
+    fontWeight: '600',
+  },
+  progressBarBackground: {
+    height: 6,
+    backgroundColor: '#2C2C2E',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#007AFF',
+    borderRadius: 3,
+    minWidth: 2,
+  },
 });
