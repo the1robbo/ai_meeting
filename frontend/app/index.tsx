@@ -35,6 +35,7 @@ export default function Index() {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
+  const router = useRouter();
 
   const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
