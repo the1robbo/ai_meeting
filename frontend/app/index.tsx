@@ -353,9 +353,9 @@ export default function Index() {
           if (item.status === 'completed') {
             router.push(`/meeting/${item.id}`);
           } else if (item.status === 'processing') {
-            Alert.alert('Processing', 'This meeting is still being processed. Please wait...');
+            showAlert('Processing', 'This meeting is still being processed. Please wait...');
           } else {
-            Alert.alert('Not Ready', 'This meeting hasn\'t been processed yet.');
+            showAlert('Not Ready', 'This meeting hasn\'t been processed yet.');
           }
         }}
       >
