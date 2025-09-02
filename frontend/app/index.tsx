@@ -371,11 +371,19 @@ const styles = StyleSheet.create({
   },
   recordingButton: {
     backgroundColor: '#FF3B30',
-    shadowColor: '#FF3B30',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#FF3B30',
+      },
+    }),
   },
   processingButton: {
     backgroundColor: '#FF9500',
-    shadowColor: '#FF9500',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#FF9500',
+      },
+    }),
   },
   recordingText: {
     fontSize: 16,
