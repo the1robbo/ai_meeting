@@ -70,6 +70,12 @@ class MeetingCreate(BaseModel):
 class QuestionCreate(BaseModel):
     question: str
 
+class MeetingUpdate(BaseModel):
+    title: Optional[str] = None
+    company_name: Optional[str] = None
+    participants: Optional[List[str]] = None
+    meeting_date: Optional[datetime] = None
+
 class ProcessingResponse(BaseModel):
     meeting_id: str
     status: str
