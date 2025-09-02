@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
-  SafeAreaView,
   StatusBar,
   ActivityIndicator,
   Platform,
+  Animated,
 } from 'react-native';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
 
 interface Meeting {
   id: string;
