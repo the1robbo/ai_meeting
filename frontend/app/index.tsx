@@ -20,7 +20,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Swipeable } from 'react-native-gesture-handler';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 import CustomAlert from '../components/CustomAlert';
+import ThemeSelector from '../components/ThemeSelector';
 import { useCustomAlert } from '../hooks/useCustomAlert';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Meeting {
   id: string;
