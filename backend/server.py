@@ -306,12 +306,13 @@ If you cannot clearly identify speaker changes, use your best judgment based on 
             key_points = []
             action_items = []
         
-        # Update meeting with results
+        # Update meeting with results - store both raw and diarized transcripts
         await db.meetings.update_one(
             {"id": meeting_id},
             {
                 "$set": {
-                    "transcript": transcript,
+                    "transcript": transcript,  # Use diarized version as main transcript
+                    "raw_transcript": raw_transcript,   # Keep original for reference
                     "summary": summary_text,
                     "key_points": key_points,
                     "action_items": action_items,
@@ -321,7 +322,7 @@ If you cannot clearly identify speaker changes, use your best judgment based on 
             }
         )
         
-        logger.info(f"AI processing completed for meeting {meeting_id}")
+        logger.info(f"AI processing with speaker diarization completed for meeting {meeting_id}")
         
     except Exception as e:
         logger.error(f"Error in AI processing for meeting {meeting_id}: {str(e)}")
