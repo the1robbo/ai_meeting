@@ -45,6 +45,14 @@ export default function MeetingDetails() {
   const [loading, setLoading] = useState(true);
   const [question, setQuestion] = useState('');
   const [askingQuestion, setAskingQuestion] = useState(false);
+  
+  // Edit mode states
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editCompany, setEditCompany] = useState('');
+  const [editParticipants, setEditParticipants] = useState('');
+  const [editDate, setEditDate] = useState('');
+  const [savingChanges, setSavingChanges] = useState(false);
 
   const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
