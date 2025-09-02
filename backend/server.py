@@ -141,10 +141,15 @@ async def upload_audio(meeting_id: str, audio_file: UploadFile = File(...)):
             content = await audio_file.read()
             await f.write(content)
         
-        # Update meeting with audio file path
+        # Update meeting with audio file path and set initial progress
         await db.meetings.update_one(
             {"id": meeting_id},
-            {"$set": {"audio_file_path": str(audio_path), "status": "uploaded"}}
+            {"$set": {
+                "audio_file_path": str(audio_path), 
+                "status": "uploaded",
+                "processing_progress": 0,
+                "processing_stage": "uploaded"
+            }}
         )
         
         return {"message": "Audio uploaded successfully", "meeting_id": meeting_id}
