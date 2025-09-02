@@ -408,8 +408,7 @@ export default function Index() {
           }
         />
       </View>
-      </View>
-    </GestureHandlerRootView>
+    </View>
   );
 }
 
