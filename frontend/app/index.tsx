@@ -86,13 +86,8 @@ export default function Index() {
     }
 
     try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-
-      const { recording: newRecording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      const { recording: newRecording } = await Audio.createRecordingAsync(
+        Audio.RecordingOptions.HIGH_QUALITY
       );
 
       setRecording(newRecording);
@@ -108,7 +103,7 @@ export default function Index() {
 
     try {
       setIsRecording(false);
-      await recording.stopAndUnloadAsync();
+      await recording.stopAsync();
       const uri = recording.getURI();
       
       if (uri) {
