@@ -208,6 +208,9 @@ async def process_audio_with_ai(meeting_id: str, audio_file_path: str):
             {"$set": {"processing_progress": 25, "processing_stage": "transcribing"}}
         )
         
+        # Add a small delay to make progress visible
+        await asyncio.sleep(1)
+        
         # First, let's use Gemini for transcription (it supports audio files)
         transcription_chat = LlmChat(
             api_key=os.environ['EMERGENT_LLM_KEY'],
