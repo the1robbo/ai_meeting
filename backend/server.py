@@ -247,30 +247,30 @@ If you cannot clearly identify speaker changes, use your best judgment based on 
         diarized_transcript = await diarization_chat.send_message(diarization_message)
         transcript = diarized_transcript.strip()
         
-        # Initialize LLM chat for summarization
+        # Initialize LLM chat for summarization using the diarized transcript
         summary_chat = LlmChat(
             api_key=os.environ['EMERGENT_LLM_KEY'],
             session_id=f"summarize_{meeting_id}",
-            system_message="You are a meeting summarization expert. Extract key points, decisions, and action items from meeting transcripts."
+            system_message="You are a meeting summarization expert. Extract key points, decisions, and action items from meeting transcripts with speaker identification."
         ).with_model("openai", "gpt-4o-mini")
         
-        # Create summarization prompt
+        # Create summarization prompt with speaker context
         summary_prompt = f"""
-        Please analyze this meeting transcript and provide:
-        1. A concise summary (2-3 paragraphs)
-        2. Key points discussed (bullet points)
-        3. Decisions made (bullet points)
-        4. Action items with responsible parties if mentioned (bullet points)
+        Please analyze this diarized meeting transcript and provide:
+        1. A concise summary (2-3 paragraphs) mentioning key participants
+        2. Key points discussed (bullet points) - include who said what when relevant
+        3. Decisions made (bullet points) - note who made decisions
+        4. Action items with responsible parties (bullet points)
 
         Format your response as JSON with the following structure:
         {{
-            "summary": "Brief summary text...",
-            "key_points": ["Point 1", "Point 2", ...],
-            "decisions": ["Decision 1", "Decision 2", ...],
-            "action_items": ["Action 1", "Action 2", ...]
+            "summary": "Brief summary text mentioning speakers...",
+            "key_points": ["Person 1 discussed X", "Person 2 mentioned Y", ...],
+            "decisions": ["Person 1 decided Z", "Group agreed on W", ...],
+            "action_items": ["Person 1 will do X by date", "Person 2 to follow up on Y", ...]
         }}
 
-        Meeting Transcript:
+        Diarized Meeting Transcript:
         {transcript}
         """
         
