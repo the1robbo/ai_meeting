@@ -133,9 +133,16 @@ export default function Index() {
     }
 
     try {
+      // Activate keep awake to prevent phone from sleeping during recording
+      activateKeepAwake();
+      
+      // Configure audio mode for background recording
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
+        shouldDuckAndroid: false,
+        playThroughEarpieceAndroid: false,
+        staysActiveInBackground: true, // Key for background recording
       });
 
       const { recording: newRecording } = await Audio.Recording.createAsync(
@@ -146,8 +153,17 @@ export default function Index() {
       setIsRecording(true);
       setIsPaused(false);
       setRecordingDuration(0);
+
+      // Show info about background recording
+      showAlert(
+        'Recording Started',
+        'Your meeting is being recorded. The recording will continue even if you lock your phone or switch to other apps.',
+        [{ text: 'OK' }]
+      );
+      
     } catch (error) {
       console.error('Failed to start recording', error);
+      deactivateKeepAwake(); // Deactivate if recording fails
       showAlert('Error', 'Failed to start recording');
     }
   };
@@ -182,6 +198,10 @@ export default function Index() {
     try {
       setIsRecording(false);
       setIsPaused(false);
+      
+      // Deactivate keep awake
+      deactivateKeepAwake();
+      
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
       
@@ -193,6 +213,7 @@ export default function Index() {
       setRecordingDuration(0);
     } catch (error) {
       console.error('Failed to stop recording', error);
+      deactivateKeepAwake(); // Make sure to deactivate even on error
       showAlert('Error', 'Failed to stop recording');
     }
   };
