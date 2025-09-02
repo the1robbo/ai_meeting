@@ -47,6 +47,7 @@ export default function Index() {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
+  const [appState, setAppState] = useState(AppState.currentState);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { alertConfig, visible, showAlert, hideAlert } = useCustomAlert();
@@ -63,6 +64,25 @@ export default function Index() {
     }
     return () => clearInterval(interval);
   }, [isRecording, isPaused]);
+
+  // Handle app state changes (background/foreground)
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: string) => {
+      console.log('App state changed:', nextAppState);
+      setAppState(nextAppState);
+      
+      // Keep recording active even when app goes to background
+      if (isRecording && nextAppState === 'background') {
+        console.log('App moved to background, maintaining recording...');
+        // Recording will continue in background
+      } else if (isRecording && nextAppState === 'active') {
+        console.log('App returned to foreground, recording still active');
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => subscription?.remove();
+  }, [isRecording]);
 
   useEffect(() => {
     requestPermissions();
