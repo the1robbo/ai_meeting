@@ -347,6 +347,42 @@ export default function Index() {
     );
   };
 
+  const renderProgressBar = (progress: number, stage: string) => {
+    const getStageText = (stage: string) => {
+      switch (stage) {
+        case 'transcribing':
+          return 'Transcribing audio...';
+        case 'diarizing':
+          return 'Identifying speakers...';
+        case 'summarizing':
+          return 'Generating summary...';
+        case 'completed':
+          return 'Processing complete';
+        case 'error':
+          return 'Processing error';
+        default:
+          return 'Processing...';
+      }
+    };
+
+    return (
+      <View style={styles.progressContainer}>
+        <View style={styles.progressHeader}>
+          <Text style={styles.progressText}>{getStageText(stage)}</Text>
+          <Text style={styles.progressPercentage}>{progress}%</Text>
+        </View>
+        <View style={styles.progressBarBackground}>
+          <View 
+            style={[
+              styles.progressBarFill, 
+              { width: `${progress}%` }
+            ]} 
+          />
+        </View>
+      </View>
+    );
+  };
+
   const renderMeeting = ({ item }: { item: Meeting }) => (
     <Swipeable renderRightActions={() => renderDeleteAction(item.id, item.title)}>
       <TouchableOpacity
@@ -378,12 +414,20 @@ export default function Index() {
             : new Date(item.created_at).toLocaleDateString()
           }
         </Text>
-        {item.status === 'processing' && (
+
+        {/* Progress Bar for Processing Meetings */}
+        {item.status === 'processing' && item.processing_progress !== undefined && (
+          renderProgressBar(item.processing_progress, item.processing_stage || 'processing')
+        )}
+
+        {/* Legacy Processing Indicator (fallback) */}
+        {item.status === 'processing' && item.processing_progress === undefined && (
           <View style={styles.processingIndicator}>
             <ActivityIndicator size="small" color="#007AFF" />
             <Text style={styles.processingText}>Processing...</Text>
           </View>
         )}
+
         {item.status === 'completed' && (
           <View style={styles.completedIndicator}>
             <Ionicons name="chevron-forward" size={16} color="#8E8E93" />
