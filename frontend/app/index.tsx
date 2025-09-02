@@ -263,14 +263,14 @@ export default function Index() {
           
           if (meeting.status === 'completed') {
             await loadMeetings();
-            Alert.alert(
+            showAlert(
               'Processing Complete',
               'Your meeting has been transcribed and summarized!',
               [{ text: 'OK' }]
             );
             return;
           } else if (meeting.status === 'error') {
-            Alert.alert('Error', 'Failed to process meeting');
+            showAlert('Error', 'Failed to process meeting');
             return;
           }
         }
@@ -279,7 +279,7 @@ export default function Index() {
         if (attempts < maxAttempts) {
           setTimeout(poll, 10000); // Poll every 10 seconds
         } else {
-          Alert.alert('Timeout', 'Processing is taking longer than expected');
+          showAlert('Timeout', 'Processing is taking longer than expected');
         }
       } catch (error) {
         console.error('Error polling status:', error);
