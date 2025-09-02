@@ -350,6 +350,8 @@ export default function Index() {
   const renderProgressBar = (progress: number, stage: string) => {
     const getStageText = (stage: string) => {
       switch (stage) {
+        case 'starting':
+          return 'Starting processing...';
         case 'transcribing':
           return 'Transcribing audio...';
         case 'diarizing':
