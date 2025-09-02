@@ -198,33 +198,33 @@ export default function MeetingDetails() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <StatusBar barStyle="light-content" backgroundColor="#000000" />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#007AFF" />
           <Text style={styles.loadingText}>Loading meeting details...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   if (!meeting) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <StatusBar barStyle="light-content" backgroundColor="#000000" />
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>Meeting not found</Text>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Text style={styles.backButtonText}>Go Back</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <StatusBar barStyle="light-content" backgroundColor="#000000" />
       
       <KeyboardAvoidingView 
         style={styles.keyboardAvoidingView}
