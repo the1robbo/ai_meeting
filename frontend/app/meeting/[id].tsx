@@ -177,51 +177,10 @@ export default function MeetingDetails() {
           </Text>
         );
       }
-    const askQuestion = async () => {
-    if (!question.trim()) {
-      Alert.alert('Error', 'Please enter a question');
-      return;
-    }
-
-    if (!meeting || meeting.status !== 'completed') {
-      Alert.alert('Error', 'Meeting must be processed before asking questions');
-      return;
-    }
-
-    try {
-      setAskingQuestion(true);
-      const response = await fetch(`${BACKEND_URL}/api/meetings/${id}/ask-question`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ question: question.trim() }),
-      });
-
-      if (response.ok) {
-        const questionAnswer = await response.json();
-        
-        // Update local meeting data
-        const updatedMeeting = {
-          ...meeting,
-          questions_answers: [
-            ...(meeting.questions_answers || []),
-            questionAnswer,
-          ],
-        };
-        setMeeting(updatedMeeting);
-        setQuestion('');
-      } else {
-        const errorData = await response.json();
-        Alert.alert('Error', errorData.detail || 'Failed to ask question');
-      }
-    } catch (error) {
-      console.error('Error asking question:', error);
-      Alert.alert('Error', 'Failed to ask question');
-    } finally {
-      setAskingQuestion(false);
-    }
+    });
   };
+
+  const askQuestion = async () => {
     if (!question.trim()) {
       Alert.alert('Error', 'Please enter a question');
       return;
