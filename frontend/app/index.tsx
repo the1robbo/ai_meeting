@@ -124,7 +124,7 @@ export default function Index() {
       setRecordingDuration(0);
     } catch (error) {
       console.error('Failed to start recording', error);
-      Alert.alert('Error', 'Failed to start recording');
+      showAlert('Error', 'Failed to start recording');
     }
   };
 
@@ -136,7 +136,7 @@ export default function Index() {
       setIsPaused(true);
     } catch (error) {
       console.error('Failed to pause recording', error);
-      Alert.alert('Error', 'Failed to pause recording');
+      showAlert('Error', 'Failed to pause recording');
     }
   };
 
@@ -148,7 +148,7 @@ export default function Index() {
       setIsPaused(false);
     } catch (error) {
       console.error('Failed to resume recording', error);
-      Alert.alert('Error', 'Failed to resume recording');
+      showAlert('Error', 'Failed to resume recording');
     }
   };
 
@@ -169,7 +169,7 @@ export default function Index() {
       setRecordingDuration(0);
     } catch (error) {
       console.error('Failed to stop recording', error);
-      Alert.alert('Error', 'Failed to stop recording');
+      showAlert('Error', 'Failed to stop recording');
     }
   };
 
