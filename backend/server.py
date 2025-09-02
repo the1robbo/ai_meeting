@@ -240,6 +240,9 @@ async def process_audio_with_ai(meeting_id: str, audio_file_path: str):
             {"$set": {"processing_progress": 50, "processing_stage": "diarizing"}}
         )
         
+        # Add delay to make progress visible
+        await asyncio.sleep(1)
+        
         # Now perform speaker diarization using AI analysis
         logger.info(f"Performing speaker diarization for meeting {meeting_id}")
         diarization_chat = LlmChat(
