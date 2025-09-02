@@ -298,8 +298,8 @@ export default function Index() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <StatusBar barStyle="light-content" backgroundColor="#000000" />
       
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Meeting Summarizer</Text>
