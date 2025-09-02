@@ -245,7 +245,7 @@ export default function Index() {
       
     } catch (error) {
       console.error('Error processing recording:', error);
-      Alert.alert('Error', 'Failed to process recording');
+      showAlert('Error', 'Failed to process recording');
     } finally {
       setIsProcessing(false);
     }
