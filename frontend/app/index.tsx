@@ -40,6 +40,7 @@ export default function Index() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
