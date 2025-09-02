@@ -25,6 +25,9 @@ interface QuestionAnswer {
 interface Meeting {
   id: string;
   title: string;
+  company_name?: string;
+  participants?: string[];
+  meeting_date?: string;
   transcript?: string;
   summary?: string;
   key_points?: string[];
