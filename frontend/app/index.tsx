@@ -451,7 +451,7 @@ export default function Index() {
   const renderMeeting = ({ item }: { item: Meeting }) => (
     <Swipeable renderRightActions={() => renderDeleteAction(item.id, item.title)}>
       <TouchableOpacity
-        style={styles.meetingItem}
+        style={[styles.meetingItem, { backgroundColor: theme.colors.card }]}
         onPress={() => {
           if (item.status === 'completed') {
             router.push(`/meeting/${item.id}`);
@@ -463,17 +463,17 @@ export default function Index() {
         }}
       >
         <View style={styles.meetingHeader}>
-          <Text style={styles.meetingTitle}>{item.title}</Text>
+          <Text style={[styles.meetingTitle, { color: theme.colors.text }]}>{item.title}</Text>
           <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
             <Text style={styles.statusText}>{item.status}</Text>
           </View>
         </View>
         
         {item.company_name && (
-          <Text style={styles.companyName}>{item.company_name}</Text>
+          <Text style={[styles.companyName, { color: theme.colors.primary }]}>{item.company_name}</Text>
         )}
         
-        <Text style={styles.meetingDate}>
+        <Text style={[styles.meetingDate, { color: theme.colors.textTertiary }]}>
           {item.meeting_date 
             ? new Date(item.meeting_date).toLocaleDateString()
             : new Date(item.created_at).toLocaleDateString()
@@ -488,15 +488,15 @@ export default function Index() {
         {/* Legacy Processing Indicator (fallback) */}
         {item.status === 'processing' && item.processing_progress === undefined && (
           <View style={styles.processingIndicator}>
-            <ActivityIndicator size="small" color="#007AFF" />
-            <Text style={styles.processingText}>Processing...</Text>
+            <ActivityIndicator size="small" color={theme.colors.primary} />
+            <Text style={[styles.processingText, { color: theme.colors.warning }]}>Processing...</Text>
           </View>
         )}
 
         {item.status === 'completed' && (
           <View style={styles.completedIndicator}>
-            <Ionicons name="chevron-forward" size={16} color="#8E8E93" />
-            <Text style={styles.tapToViewText}>Tap to view & ask questions</Text>
+            <Ionicons name="chevron-forward" size={16} color={theme.colors.textTertiary} />
+            <Text style={[styles.tapToViewText, { color: theme.colors.textTertiary }]}>Tap to view & ask questions</Text>
           </View>
         )}
       </TouchableOpacity>
