@@ -508,7 +508,6 @@ export default function Index() {
           </View>
         </>
       )}
-      </View>
     </View>
   );
 }
@@ -670,6 +669,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 4,
   },
+  // Recording Mode Styles
   recordingModeContainer: {
     flex: 1,
     justifyContent: 'center',
