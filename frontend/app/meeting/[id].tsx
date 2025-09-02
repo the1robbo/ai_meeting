@@ -234,14 +234,126 @@ export default function MeetingDetails() {
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
           <Text style={styles.headerTitle} numberOfLines={1}>
-            {meeting.title}
+            {isEditing ? 'Edit Meeting' : meeting.title}
           </Text>
-          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(meeting.status) }]}>
-            <Text style={styles.statusText}>{meeting.status}</Text>
+          <View style={styles.headerActions}>
+            {!isEditing ? (
+              <TouchableOpacity onPress={startEditing} style={styles.editButton}>
+                <Ionicons name="create-outline" size={20} color="#007AFF" />
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.editActions}>
+                <TouchableOpacity onPress={cancelEditing} style={styles.cancelButton}>
+                  <Ionicons name="close" size={20} color="#FF3B30" />
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  onPress={saveChanges} 
+                  style={[styles.saveButton, savingChanges && styles.saveButtonDisabled]}
+                  disabled={savingChanges}
+                >
+                  {savingChanges ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Ionicons name="checkmark" size={20} color="#FFFFFF" />
+                  )}
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </View>
 
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          {/* Meeting Info Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Meeting Information</Text>
+            
+            {isEditing ? (
+              <View style={styles.editForm}>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Title *</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={editTitle}
+                    onChangeText={setEditTitle}
+                    placeholder="Meeting title"
+                    placeholderTextColor="#8E8E93"
+                  />
+                </View>
+                
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Company</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={editCompany}
+                    onChangeText={setEditCompany}
+                    placeholder="Company name (optional)"
+                    placeholderTextColor="#8E8E93"
+                  />
+                </View>
+                
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Participants</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={editParticipants}
+                    onChangeText={setEditParticipants}
+                    placeholder="John Doe, Jane Smith (comma separated)"
+                    placeholderTextColor="#8E8E93"
+                    multiline
+                  />
+                </View>
+                
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Meeting Date</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={editDate}
+                    onChangeText={setEditDate}
+                    placeholder="YYYY-MM-DD"
+                    placeholderTextColor="#8E8E93"
+                  />
+                </View>
+              </View>
+            ) : (
+              <View style={styles.meetingInfo}>
+                {meeting.company_name && (
+                  <View style={styles.infoRow}>
+                    <Ionicons name="business" size={16} color="#007AFF" />
+                    <Text style={styles.infoText}>{meeting.company_name}</Text>
+                  </View>
+                )}
+                
+                {meeting.participants && meeting.participants.length > 0 && (
+                  <View style={styles.infoRow}>
+                    <Ionicons name="people" size={16} color="#007AFF" />
+                    <Text style={styles.infoText}>{meeting.participants.join(', ')}</Text>
+                  </View>
+                )}
+                
+                {meeting.meeting_date && (
+                  <View style={styles.infoRow}>
+                    <Ionicons name="calendar" size={16} color="#007AFF" />
+                    <Text style={styles.infoText}>
+                      {new Date(meeting.meeting_date).toLocaleDateString()}
+                    </Text>
+                  </View>
+                )}
+                
+                <View style={styles.infoRow}>
+                  <Ionicons name="time" size={16} color="#007AFF" />
+                  <Text style={styles.infoText}>
+                    Created: {new Date(meeting.created_at).toLocaleDateString()}
+                  </Text>
+                </View>
+                
+                <View style={styles.statusRow}>
+                  <View style={[styles.statusBadge, { backgroundColor: getStatusColor(meeting.status) }]}>
+                    <Text style={styles.statusText}>{meeting.status}</Text>
+                  </View>
+                </View>
+              </View>
+            )}
+          </View>
           {meeting.status === 'completed' ? (
             <>
               {/* Summary Section */}
