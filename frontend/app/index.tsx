@@ -71,7 +71,7 @@ export default function Index() {
       setHasPermission(status === 'granted');
       
       if (status !== 'granted') {
-        Alert.alert(
+        showAlert(
           'Permission Required',
           'This app needs microphone access to record meetings.',
           [{ text: 'OK' }]
