@@ -170,10 +170,14 @@ async def process_meeting(meeting_id: str):
         if not meeting.get("audio_file_path"):
             raise HTTPException(status_code=400, detail="No audio file uploaded")
         
-        # Update status to processing
+        # Update status to processing with initial progress
         await db.meetings.update_one(
             {"id": meeting_id},
-            {"$set": {"status": "processing"}}
+            {"$set": {
+                "status": "processing",
+                "processing_progress": 10,
+                "processing_stage": "starting"
+            }}
         )
         
         # Process in background (you could use Celery for production)
