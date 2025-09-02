@@ -802,6 +802,31 @@ const styles = StyleSheet.create({
     color: '#E5E5E7',
     lineHeight: 20,
   },
+  transcriptLine: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+    paddingLeft: 8,
+  },
+  speakerLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#007AFF',
+    marginRight: 8,
+    minWidth: 70,
+  },
+  speakerText: {
+    fontSize: 14,
+    color: '#E5E5E7',
+    lineHeight: 20,
+    flex: 1,
+  },
+  regularTranscriptText: {
+    fontSize: 14,
+    color: '#E5E5E7',
+    lineHeight: 20,
+    marginBottom: 8,
+  },
   processingContainer: {
     flex: 1,
     justifyContent: 'center',
