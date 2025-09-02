@@ -240,49 +240,107 @@ export default function Index() {
     poll();
   };
 
-  const renderMeeting = ({ item }: { item: Meeting }) => (
-    <TouchableOpacity
-      style={styles.meetingItem}
-      onPress={() => {
-        if (item.status === 'completed') {
-          router.push(`/meeting/${item.id}`);
-        } else if (item.status === 'processing') {
-          Alert.alert('Processing', 'This meeting is still being processed. Please wait...');
-        } else {
-          Alert.alert('Not Ready', 'This meeting hasn\'t been processed yet.');
-        }
-      }}
-    >
-      <View style={styles.meetingHeader}>
-        <Text style={styles.meetingTitle}>{item.title}</Text>
-        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
-          <Text style={styles.statusText}>{item.status}</Text>
-        </View>
+  const deleteMeeting = async (meetingId: string, meetingTitle: string) => {
+    Alert.alert(
+      'Delete Meeting',
+      `Are you sure you want to delete "${meetingTitle}"? This action cannot be undone.`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const response = await fetch(`${BACKEND_URL}/api/meetings/${meetingId}`, {
+                method: 'DELETE',
+              });
+
+              if (response.ok) {
+                // Remove from local state
+                setMeetings(prevMeetings => 
+                  prevMeetings.filter(meeting => meeting.id !== meetingId)
+                );
+                
+                // Update AsyncStorage
+                const updatedMeetings = meetings.filter(meeting => meeting.id !== meetingId);
+                await AsyncStorage.setItem('meetings', JSON.stringify(updatedMeetings));
+                
+                Alert.alert('Success', 'Meeting deleted successfully');
+              } else {
+                Alert.alert('Error', 'Failed to delete meeting');
+              }
+            } catch (error) {
+              console.error('Error deleting meeting:', error);
+              Alert.alert('Error', 'Failed to delete meeting');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const renderDeleteAction = (meetingId: string, meetingTitle: string) => {
+    return (
+      <View style={styles.deleteAction}>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => deleteMeeting(meetingId, meetingTitle)}
+        >
+          <Ionicons name="trash" size={24} color="#FFFFFF" />
+          <Text style={styles.deleteButtonText}>Delete</Text>
+        </TouchableOpacity>
       </View>
-      
-      {item.company_name && (
-        <Text style={styles.companyName}>{item.company_name}</Text>
-      )}
-      
-      <Text style={styles.meetingDate}>
-        {item.meeting_date 
-          ? new Date(item.meeting_date).toLocaleDateString()
-          : new Date(item.created_at).toLocaleDateString()
-        }
-      </Text>
-      {item.status === 'processing' && (
-        <View style={styles.processingIndicator}>
-          <ActivityIndicator size="small" color="#007AFF" />
-          <Text style={styles.processingText}>Processing...</Text>
+    );
+  };
+
+  const renderMeeting = ({ item }: { item: Meeting }) => (
+    <Swipeable renderRightActions={() => renderDeleteAction(item.id, item.title)}>
+      <TouchableOpacity
+        style={styles.meetingItem}
+        onPress={() => {
+          if (item.status === 'completed') {
+            router.push(`/meeting/${item.id}`);
+          } else if (item.status === 'processing') {
+            Alert.alert('Processing', 'This meeting is still being processed. Please wait...');
+          } else {
+            Alert.alert('Not Ready', 'This meeting hasn\'t been processed yet.');
+          }
+        }}
+      >
+        <View style={styles.meetingHeader}>
+          <Text style={styles.meetingTitle}>{item.title}</Text>
+          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
+            <Text style={styles.statusText}>{item.status}</Text>
+          </View>
         </View>
-      )}
-      {item.status === 'completed' && (
-        <View style={styles.completedIndicator}>
-          <Ionicons name="chevron-forward" size={16} color="#8E8E93" />
-          <Text style={styles.tapToViewText}>Tap to view & ask questions</Text>
-        </View>
-      )}
-    </TouchableOpacity>
+        
+        {item.company_name && (
+          <Text style={styles.companyName}>{item.company_name}</Text>
+        )}
+        
+        <Text style={styles.meetingDate}>
+          {item.meeting_date 
+            ? new Date(item.meeting_date).toLocaleDateString()
+            : new Date(item.created_at).toLocaleDateString()
+          }
+        </Text>
+        {item.status === 'processing' && (
+          <View style={styles.processingIndicator}>
+            <ActivityIndicator size="small" color="#007AFF" />
+            <Text style={styles.processingText}>Processing...</Text>
+          </View>
+        )}
+        {item.status === 'completed' && (
+          <View style={styles.completedIndicator}>
+            <Ionicons name="chevron-forward" size={16} color="#8E8E93" />
+            <Text style={styles.tapToViewText}>Tap to view & ask questions</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    </Swipeable>
   );
 
   const getStatusColor = (status: string) => {
