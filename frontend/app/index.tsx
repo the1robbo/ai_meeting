@@ -256,8 +256,16 @@ export default function Index() {
           <Text style={styles.statusText}>{item.status}</Text>
         </View>
       </View>
+      
+      {item.company_name && (
+        <Text style={styles.companyName}>{item.company_name}</Text>
+      )}
+      
       <Text style={styles.meetingDate}>
-        {new Date(item.created_at).toLocaleDateString()}
+        {item.meeting_date 
+          ? new Date(item.meeting_date).toLocaleDateString()
+          : new Date(item.created_at).toLocaleDateString()
+        }
       </Text>
       {item.status === 'processing' && (
         <View style={styles.processingIndicator}>
