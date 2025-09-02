@@ -517,19 +517,19 @@ export default function Index() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+    <View style={[styles.container, { backgroundColor: theme.colors.background, paddingTop: insets.top }]}>
+      <StatusBar barStyle={theme.colors.statusBar} backgroundColor={theme.colors.background} />
 
       {/* Recording Mode - Focused Interface */}
       {isRecording ? (
-        <View style={styles.recordingModeContainer}>
+        <View style={[styles.recordingModeContainer, { backgroundColor: theme.colors.background }]}>
           {/* Recording Status */}
           <View style={styles.recordingStatusContainer}>
             <View style={[styles.recordingIndicator, isPaused && styles.pausedIndicator]} />
-            <Text style={styles.recordingStatusText}>
+            <Text style={[styles.recordingStatusText, { color: theme.colors.text }]}>
               {isPaused ? 'Recording Paused' : 'Recording in Progress'}
             </Text>
-            <Text style={styles.recordingDuration}>
+            <Text style={[styles.recordingDuration, { color: theme.colors.text }]}>
               {formatDuration(recordingDuration)}
             </Text>
           </View>
@@ -554,7 +554,7 @@ export default function Index() {
           {/* Control Buttons */}
           <View style={styles.recordingControls}>
             <TouchableOpacity
-              style={[styles.controlButton, isPaused && styles.resumeButton]}
+              style={[styles.controlButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }, isPaused && styles.resumeButton]}
               onPress={isPaused ? resumeRecording : pauseRecording}
               disabled={isProcessing}
             >
@@ -569,7 +569,7 @@ export default function Index() {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.recordingText}>
+          <Text style={[styles.recordingText, { color: theme.colors.textTertiary }]}>
             {isProcessing
               ? 'Processing recording...'
               : 'Recording continues even if you lock your phone or switch apps. Tap stop when finished, or pause to skip sections.'}
@@ -578,14 +578,25 @@ export default function Index() {
       ) : (
         /* Normal Mode - Show meetings list */
         <>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Meeting Summarizer</Text>
+          <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
+            <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Meeting Summarizer</Text>
+            <TouchableOpacity 
+              onPress={() => setShowThemeSelector(true)}
+              style={styles.themeButton}
+            >
+              <Ionicons 
+                name={isDark ? 'moon' : 'sunny'} 
+                size={24} 
+                color={theme.colors.textSecondary} 
+              />
+            </TouchableOpacity>
           </View>
 
           <View style={styles.recordingSection}>
             <TouchableOpacity
               style={[
                 styles.recordButton,
+                { backgroundColor: theme.colors.primary },
                 isProcessing && styles.processingButton,
               ]}
               onPress={startRecording}
@@ -598,7 +609,7 @@ export default function Index() {
               )}
             </TouchableOpacity>
             
-            <Text style={styles.recordingText}>
+            <Text style={[styles.recordingText, { color: theme.colors.textTertiary }]}>
               {isProcessing
                 ? 'Processing...'
                 : 'Tap to start recording'}
@@ -606,7 +617,7 @@ export default function Index() {
           </View>
 
           <View style={styles.meetingsSection}>
-            <Text style={styles.sectionTitle}>Recent Meetings</Text>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Recent Meetings</Text>
             <FlatList
               data={meetings}
               renderItem={renderMeeting}
@@ -615,7 +626,7 @@ export default function Index() {
               onRefresh={loadMeetings}
               showsVerticalScrollIndicator={false}
               ListEmptyComponent={
-                <Text style={styles.emptyText}>No meetings yet. Start recording!</Text>
+                <Text style={[styles.emptyText, { color: theme.colors.textTertiary }]}>No meetings yet. Start recording!</Text>
               }
             />
           </View>
@@ -632,6 +643,12 @@ export default function Index() {
           onClose={hideAlert}
         />
       )}
+
+      {/* Theme Selector Modal */}
+      <ThemeSelector
+        visible={showThemeSelector}
+        onClose={() => setShowThemeSelector(false)}
+      />
     </View>
   );
 }
