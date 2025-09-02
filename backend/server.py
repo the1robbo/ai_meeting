@@ -283,6 +283,9 @@ If you cannot clearly identify speaker changes, use your best judgment based on 
             {"$set": {"processing_progress": 75, "processing_stage": "summarizing"}}
         )
         
+        # Add delay to make progress visible
+        await asyncio.sleep(1)
+        
         # Initialize LLM chat for summarization using the diarized transcript
         summary_chat = LlmChat(
             api_key=os.environ['EMERGENT_LLM_KEY'],
