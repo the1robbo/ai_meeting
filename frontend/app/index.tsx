@@ -568,7 +568,7 @@ export default function Index() {
           <Text style={styles.recordingText}>
             {isProcessing
               ? 'Processing recording...'
-              : 'Tap stop when finished, or pause to skip sections'}
+              : 'Recording continues even if you lock your phone or switch apps. Tap stop when finished, or pause to skip sections.'}
           </Text>
         </View>
       ) : (
