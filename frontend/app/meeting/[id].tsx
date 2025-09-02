@@ -151,7 +151,34 @@ export default function MeetingDetails() {
     }
   };
 
-  const askQuestion = async () => {
+  const formatDiarizedTranscript = (transcript: string) => {
+    if (!transcript) return null;
+    
+    // Split by lines and format speaker labels
+    const lines = transcript.split('\n').filter(line => line.trim());
+    
+    return lines.map((line, index) => {
+      // Check if line starts with "Person X:" pattern
+      const speakerMatch = line.match(/^(Person \d+):\s*(.*)$/);
+      
+      if (speakerMatch) {
+        const [, speaker, text] = speakerMatch;
+        return (
+          <View key={index} style={styles.transcriptLine}>
+            <Text style={styles.speakerLabel}>{speaker}:</Text>
+            <Text style={styles.speakerText}>{text}</Text>
+          </View>
+        );
+      } else {
+        // Regular text without speaker label
+        return (
+          <Text key={index} style={styles.regularTranscriptText}>
+            {line}
+          </Text>
+        );
+      }
+    });
+  };
     if (!question.trim()) {
       Alert.alert('Error', 'Please enter a question');
       return;
