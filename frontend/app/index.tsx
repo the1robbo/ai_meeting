@@ -406,14 +406,6 @@ export default function Index() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="light-content" backgroundColor="#000000" />
-      
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Meeting Summarizer</Text>
-      </View>
-
-  return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
 
       {/* Recording Mode - Focused Interface */}
       {isRecording ? (
