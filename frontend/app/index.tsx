@@ -263,8 +263,10 @@ export default function Index() {
         if (response.ok) {
           const meeting = await response.json();
           
+          // Always refresh meetings list to show progress updates
+          await loadMeetings();
+          
           if (meeting.status === 'completed') {
-            await loadMeetings();
             showAlert(
               'Processing Complete',
               'Your meeting has been transcribed and summarized!',
@@ -279,7 +281,7 @@ export default function Index() {
 
         attempts++;
         if (attempts < maxAttempts) {
-          setTimeout(poll, 10000); // Poll every 10 seconds
+          setTimeout(poll, 3000); // Poll every 3 seconds (faster to show progress)
         } else {
           showAlert('Timeout', 'Processing is taking longer than expected');
         }
