@@ -56,6 +56,7 @@ class MeetingRecording(BaseModel):
     meeting_date: Optional[datetime] = None
     audio_file_path: Optional[str] = None
     transcript: Optional[str] = None
+    raw_transcript: Optional[str] = None  # Original transcript before diarization
     summary: Optional[str] = None
     key_points: Optional[List[str]] = None
     action_items: Optional[List[str]] = None
