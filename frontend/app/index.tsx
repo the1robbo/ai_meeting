@@ -87,7 +87,21 @@ export default function Index() {
   useEffect(() => {
     requestPermissions();
     loadMeetings();
+
+    // Cleanup function to deactivate keep awake when component unmounts
+    return () => {
+      if (isRecording) {
+        deactivateKeepAwake();
+      }
+    };
   }, []);
+
+  // Cleanup keep awake when recording stops
+  useEffect(() => {
+    if (!isRecording) {
+      deactivateKeepAwake();
+    }
+  }, [isRecording]);
 
   const requestPermissions = async () => {
     try {
