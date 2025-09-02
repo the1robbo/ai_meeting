@@ -511,10 +511,22 @@ export default function MeetingDetails() {
               {/* Transcript Section (Collapsible) */}
               {meeting.transcript && (
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Full Transcript</Text>
+                  <Text style={styles.sectionTitle}>Full Transcript (with Speakers)</Text>
                   <View style={styles.transcriptContainer}>
-                    <Text style={styles.transcriptText}>{meeting.transcript}</Text>
+                    {formatDiarizedTranscript(meeting.transcript)}
                   </View>
+                  
+                  {/* Show raw transcript if available */}
+                  {meeting.raw_transcript && meeting.raw_transcript !== meeting.transcript && (
+                    <>
+                      <Text style={[styles.sectionTitle, { marginTop: 20, fontSize: 16 }]}>
+                        Original Transcript (without speakers)
+                      </Text>
+                      <View style={[styles.transcriptContainer, { marginTop: 8 }]}>
+                        <Text style={styles.transcriptText}>{meeting.raw_transcript}</Text>
+                      </View>
+                    </>
+                  )}
                 </View>
               )}
             </>
