@@ -459,7 +459,7 @@ export default function MeetingDetails() {
           )}
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
