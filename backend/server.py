@@ -231,14 +231,28 @@ async def process_audio_with_ai(meeting_id: str, audio_file_path: str):
         summary_message = UserMessage(text=summary_prompt)
         summary_response = await summary_chat.send_message(summary_message)
         
-        # Parse summary response (you might want to add better JSON parsing)
+        # Parse summary response with better JSON extraction
         import json
+        import re
+        
         try:
-            summary_data = json.loads(summary_response)
+            # Try to extract JSON from markdown code blocks
+            json_match = re.search(r'```json\s*(\{.*?\})\s*```', summary_response, re.DOTALL)
+            if json_match:
+                json_str = json_match.group(1)
+            else:
+                # Try to find JSON without code blocks
+                json_match = re.search(r'(\{.*\})', summary_response, re.DOTALL)
+                if json_match:
+                    json_str = json_match.group(1)
+                else:
+                    json_str = summary_response
+            
+            summary_data = json.loads(json_str)
             summary_text = summary_data.get("summary", "")
             key_points = summary_data.get("key_points", []) + summary_data.get("decisions", [])
             action_items = summary_data.get("action_items", [])
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, AttributeError):
             # Fallback if JSON parsing fails
             summary_text = summary_response
             key_points = []
