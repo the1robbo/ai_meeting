@@ -234,7 +234,7 @@ export default function Index() {
         throw new Error('Failed to start processing');
       }
 
-      Alert.alert(
+      showAlert(
         'Processing Started',
         'Your meeting is being processed. This may take a few minutes.',
         [{ text: 'OK' }]
