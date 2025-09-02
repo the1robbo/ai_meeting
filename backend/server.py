@@ -43,6 +43,11 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+class QuestionAnswer(BaseModel):
+    question: str
+    answer: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
 class MeetingRecording(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
@@ -51,6 +56,7 @@ class MeetingRecording(BaseModel):
     summary: Optional[str] = None
     key_points: Optional[List[str]] = None
     action_items: Optional[List[str]] = None
+    questions_answers: Optional[List[QuestionAnswer]] = []
     created_at: datetime = Field(default_factory=datetime.utcnow)
     processed_at: Optional[datetime] = None
     status: str = "recording"  # recording, processing, completed, error
