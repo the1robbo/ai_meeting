@@ -656,19 +656,24 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
   },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#333333',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FFFFFF',
     textAlign: 'center',
+    flex: 1,
+  },
+  themeButton: {
+    padding: 8,
+    borderRadius: 20,
   },
   recordingSection: {
     alignItems: 'center',
