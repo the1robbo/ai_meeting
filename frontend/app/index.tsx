@@ -457,6 +457,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#8E8E93',
   },
+  companyName: {
+    fontSize: 14,
+    color: '#007AFF',
+    fontWeight: '500',
+    marginTop: 4,
+  },
   processingIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
