@@ -411,49 +411,111 @@ export default function Index() {
         <Text style={styles.headerTitle}>Meeting Summarizer</Text>
       </View>
 
-      <View style={styles.recordingSection}>
-        <TouchableOpacity
-          style={[
-            styles.recordButton,
-            isRecording && styles.recordingButton,
-            isProcessing && styles.processingButton,
-          ]}
-          onPress={isRecording ? stopRecording : startRecording}
-          disabled={isProcessing}
-        >
-          {isProcessing ? (
-            <ActivityIndicator size="large" color="#FFFFFF" />
-          ) : (
-            <Ionicons
-              name={isRecording ? 'stop' : 'mic'}
-              size={48}
-              color="#FFFFFF"
-            />
-          )}
-        </TouchableOpacity>
-        
-        <Text style={styles.recordingText}>
-          {isProcessing
-            ? 'Processing...'
-            : isRecording
-            ? 'Tap to stop recording'
-            : 'Tap to start recording'}
-        </Text>
+  return (
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+      
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Meeting Summarizer</Text>
       </View>
 
-      <View style={styles.meetingsSection}>
-        <Text style={styles.sectionTitle}>Recent Meetings</Text>
-        <FlatList
-          data={meetings}
-          renderItem={renderMeeting}
-          keyExtractor={(item) => item.id}
-          refreshing={false}
-          onRefresh={loadMeetings}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>No meetings yet. Start recording!</Text>
-          }
-        />
+      {/* Recording Mode - Focused Interface */}
+      {isRecording ? (
+        <View style={styles.recordingModeContainer}>
+          {/* Recording Status */}
+          <View style={styles.recordingStatusContainer}>
+            <View style={[styles.recordingIndicator, isPaused && styles.pausedIndicator]} />
+            <Text style={styles.recordingStatusText}>
+              {isPaused ? 'Recording Paused' : 'Recording in Progress'}
+            </Text>
+            <Text style={styles.recordingDuration}>
+              {formatDuration(recordingDuration)}
+            </Text>
+          </View>
+
+          {/* Main Recording Button */}
+          <TouchableOpacity
+            style={[
+              styles.recordButton,
+              styles.recordingButton,
+              isPaused && styles.pausedButton,
+            ]}
+            onPress={stopRecording}
+            disabled={isProcessing}
+          >
+            {isProcessing ? (
+              <ActivityIndicator size="large" color="#FFFFFF" />
+            ) : (
+              <Ionicons name="stop" size={48} color="#FFFFFF" />
+            )}
+          </TouchableOpacity>
+
+          {/* Control Buttons */}
+          <View style={styles.recordingControls}>
+            <TouchableOpacity
+              style={[styles.controlButton, isPaused && styles.resumeButton]}
+              onPress={isPaused ? resumeRecording : pauseRecording}
+              disabled={isProcessing}
+            >
+              <Ionicons 
+                name={isPaused ? 'play' : 'pause'} 
+                size={24} 
+                color="#FFFFFF" 
+              />
+              <Text style={styles.controlButtonText}>
+                {isPaused ? 'Resume' : 'Pause'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.recordingText}>
+            {isProcessing
+              ? 'Processing recording...'
+              : 'Tap stop when finished, or pause to skip sections'}
+          </Text>
+        </View>
+      ) : (
+        /* Normal Mode - Show meetings list */
+        <>
+          <View style={styles.recordingSection}>
+            <TouchableOpacity
+              style={[
+                styles.recordButton,
+                isProcessing && styles.processingButton,
+              ]}
+              onPress={startRecording}
+              disabled={isProcessing}
+            >
+              {isProcessing ? (
+                <ActivityIndicator size="large" color="#FFFFFF" />
+              ) : (
+                <Ionicons name="mic" size={48} color="#FFFFFF" />
+              )}
+            </TouchableOpacity>
+            
+            <Text style={styles.recordingText}>
+              {isProcessing
+                ? 'Processing...'
+                : 'Tap to start recording'}
+            </Text>
+          </View>
+
+          <View style={styles.meetingsSection}>
+            <Text style={styles.sectionTitle}>Recent Meetings</Text>
+            <FlatList
+              data={meetings}
+              renderItem={renderMeeting}
+              keyExtractor={(item) => item.id}
+              refreshing={false}
+              onRefresh={loadMeetings}
+              showsVerticalScrollIndicator={false}
+              ListEmptyComponent={
+                <Text style={styles.emptyText}>No meetings yet. Start recording!</Text>
+              }
+            />
+          </View>
+        </>
+      )}
       </View>
     </View>
   );
