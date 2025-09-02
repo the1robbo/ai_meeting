@@ -51,6 +51,9 @@ class QuestionAnswer(BaseModel):
 class MeetingRecording(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
+    company_name: Optional[str] = None
+    participants: Optional[List[str]] = []
+    meeting_date: Optional[datetime] = None
     audio_file_path: Optional[str] = None
     transcript: Optional[str] = None
     summary: Optional[str] = None
