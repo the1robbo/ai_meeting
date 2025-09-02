@@ -61,6 +61,8 @@ class MeetingRecording(BaseModel):
     key_points: Optional[List[str]] = None
     action_items: Optional[List[str]] = None
     questions_answers: Optional[List[QuestionAnswer]] = []
+    processing_progress: Optional[int] = 0  # Progress percentage (0-100)
+    processing_stage: Optional[str] = "idle"  # idle, uploading, transcribing, diarizing, summarizing, completed
     created_at: datetime = Field(default_factory=datetime.utcnow)
     processed_at: Optional[datetime] = None
     status: str = "recording"  # recording, processing, completed, error
