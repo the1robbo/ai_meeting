@@ -17,7 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Swipeable } from 'react-native-gesture-handler';
 
 interface Meeting {
   id: string;
