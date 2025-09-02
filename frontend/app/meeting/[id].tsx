@@ -60,6 +60,16 @@ export default function MeetingDetails() {
     loadMeeting();
   }, [id]);
 
+  useEffect(() => {
+    // Initialize edit fields when meeting loads
+    if (meeting) {
+      setEditTitle(meeting.title || '');
+      setEditCompany(meeting.company_name || '');
+      setEditParticipants(meeting.participants?.join(', ') || '');
+      setEditDate(meeting.meeting_date ? new Date(meeting.meeting_date).toISOString().split('T')[0] : '');
+    }
+  }, [meeting]);
+
   const loadMeeting = async () => {
     try {
       setLoading(true);
@@ -76,6 +86,65 @@ export default function MeetingDetails() {
       Alert.alert('Error', 'Failed to load meeting details');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const startEditing = () => {
+    setIsEditing(true);
+  };
+
+  const cancelEditing = () => {
+    setIsEditing(false);
+    // Reset edit fields to current meeting values
+    if (meeting) {
+      setEditTitle(meeting.title || '');
+      setEditCompany(meeting.company_name || '');
+      setEditParticipants(meeting.participants?.join(', ') || '');
+      setEditDate(meeting.meeting_date ? new Date(meeting.meeting_date).toISOString().split('T')[0] : '');
+    }
+  };
+
+  const saveChanges = async () => {
+    if (!meeting || !editTitle.trim()) {
+      Alert.alert('Error', 'Meeting title is required');
+      return;
+    }
+
+    try {
+      setSavingChanges(true);
+      
+      const updateData: any = {
+        title: editTitle.trim(),
+        company_name: editCompany.trim() || null,
+        participants: editParticipants.trim() ? editParticipants.split(',').map(p => p.trim()).filter(p => p) : [],
+      };
+
+      if (editDate) {
+        updateData.meeting_date = new Date(editDate).toISOString();
+      }
+
+      const response = await fetch(`${BACKEND_URL}/api/meetings/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      if (response.ok) {
+        const updatedMeeting = await response.json();
+        setMeeting(updatedMeeting);
+        setIsEditing(false);
+        Alert.alert('Success', 'Meeting details updated successfully');
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.detail || 'Failed to update meeting');
+      }
+    } catch (error) {
+      console.error('Error saving changes:', error);
+      Alert.alert('Error', 'Failed to update meeting details');
+    } finally {
+      setSavingChanges(false);
     }
   };
 
