@@ -118,9 +118,35 @@ export default function Index() {
 
       setRecording(newRecording);
       setIsRecording(true);
+      setIsPaused(false);
+      setRecordingDuration(0);
     } catch (error) {
       console.error('Failed to start recording', error);
       Alert.alert('Error', 'Failed to start recording');
+    }
+  };
+
+  const pauseRecording = async () => {
+    if (!recording) return;
+
+    try {
+      await recording.pauseAsync();
+      setIsPaused(true);
+    } catch (error) {
+      console.error('Failed to pause recording', error);
+      Alert.alert('Error', 'Failed to pause recording');
+    }
+  };
+
+  const resumeRecording = async () => {
+    if (!recording) return;
+
+    try {
+      await recording.startAsync();
+      setIsPaused(false);
+    } catch (error) {
+      console.error('Failed to resume recording', error);
+      Alert.alert('Error', 'Failed to resume recording');
     }
   };
 
@@ -129,6 +155,7 @@ export default function Index() {
 
     try {
       setIsRecording(false);
+      setIsPaused(false);
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
       
@@ -137,10 +164,17 @@ export default function Index() {
       }
       
       setRecording(null);
+      setRecordingDuration(0);
     } catch (error) {
       console.error('Failed to stop recording', error);
       Alert.alert('Error', 'Failed to stop recording');
     }
+  };
+
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   const processRecording = async (audioUri: string) => {
