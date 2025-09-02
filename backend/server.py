@@ -291,6 +291,87 @@ async def process_audio_with_ai(meeting_id: str, audio_file_path: str):
             {"$set": {"status": "error"}}
         )
 
+@api_router.post("/meetings/{meeting_id}/ask-question")
+async def ask_question_about_meeting(meeting_id: str, question_data: QuestionCreate):
+    """Ask a question about a meeting and get AI-powered answer based on meeting content"""
+    try:
+        # Get meeting
+        meeting = await db.meetings.find_one({"id": meeting_id})
+        if not meeting:
+            raise HTTPException(status_code=404, detail="Meeting not found")
+        
+        if meeting.get("status") != "completed":
+            raise HTTPException(status_code=400, detail="Meeting must be processed before asking questions")
+        
+        # Prepare context from meeting content
+        context_parts = []
+        
+        if meeting.get("summary"):
+            context_parts.append(f"Summary: {meeting['summary']}")
+        
+        if meeting.get("transcript"):
+            context_parts.append(f"Full Transcript: {meeting['transcript']}")
+        
+        if meeting.get("key_points"):
+            context_parts.append(f"Key Points: {', '.join(meeting['key_points'])}")
+        
+        if meeting.get("action_items"):
+            context_parts.append(f"Action Items: {', '.join(meeting['action_items'])}")
+        
+        if not context_parts:
+            raise HTTPException(status_code=400, detail="No meeting content available to answer questions")
+        
+        meeting_context = "\n\n".join(context_parts)
+        
+        # Initialize LLM chat for question answering
+        qa_chat = LlmChat(
+            api_key=os.environ['EMERGENT_LLM_KEY'],
+            session_id=f"qa_{meeting_id}_{datetime.utcnow().timestamp()}",
+            system_message="You are a helpful assistant that answers questions about meeting content. Base your answers strictly on the provided meeting information. If you cannot answer based on the available information, say so clearly."
+        ).with_model("openai", "gpt-4o-mini")
+        
+        # Create question prompt
+        question_prompt = f"""
+        Based on the following meeting information, please answer the user's question:
+
+        Meeting Information:
+        {meeting_context}
+
+        User Question: {question_data.question}
+
+        Please provide a helpful and accurate answer based only on the meeting information provided above. If the question cannot be answered from the available information, please state that clearly.
+        """
+        
+        # Get answer from AI
+        logger.info(f"Processing question for meeting {meeting_id}: {question_data.question}")
+        question_message = UserMessage(text=question_prompt)
+        answer_response = await qa_chat.send_message(question_message)
+        
+        # Create Q&A object
+        qa_entry = QuestionAnswer(
+            question=question_data.question,
+            answer=answer_response.strip()
+        )
+        
+        # Add Q&A to meeting
+        existing_qas = meeting.get("questions_answers", [])
+        existing_qas.append(qa_entry.dict())
+        
+        await db.meetings.update_one(
+            {"id": meeting_id},
+            {"$set": {"questions_answers": existing_qas}}
+        )
+        
+        logger.info(f"Question answered for meeting {meeting_id}")
+        
+        return qa_entry
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error processing question for meeting {meeting_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error processing question: {str(e)}")
+
 @api_router.delete("/meetings/{meeting_id}")
 async def delete_meeting(meeting_id: str):
     """Delete a meeting recording"""
