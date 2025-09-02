@@ -678,4 +678,77 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 4,
   },
+  recordingModeContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  recordingStatusContainer: {
+    alignItems: 'center',
+    marginBottom: 60,
+  },
+  recordingIndicator: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#FF3B30',
+    marginBottom: 16,
+    shadowColor: '#FF3B30',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.6,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  pausedIndicator: {
+    backgroundColor: '#FF9500',
+    shadowColor: '#FF9500',
+  },
+  recordingStatusText: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  recordingDuration: {
+    fontSize: 48,
+    fontWeight: '300',
+    color: '#FFFFFF',
+    fontFamily: Platform.OS === 'ios' ? 'SF Mono' : 'monospace',
+  },
+  pausedButton: {
+    backgroundColor: '#FF9500',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#FF9500',
+      },
+    }),
+  },
+  recordingControls: {
+    flexDirection: 'row',
+    marginTop: 40,
+    gap: 20,
+  },
+  controlButton: {
+    backgroundColor: '#1C1C1E',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 100,
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  resumeButton: {
+    backgroundColor: '#34C759',
+    borderColor: '#34C759',
+  },
+  controlButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '500',
+    marginTop: 4,
+  },
 });
