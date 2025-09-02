@@ -313,6 +313,302 @@ class BackendTester:
             self.log_test("AI Processing", False, f"Error: {str(e)}")
             return False
 
+    def test_qa_before_processing(self):
+        """Test Q&A endpoint before meeting is processed (should fail)"""
+        if not self.test_meeting_id:
+            self.log_test("Q&A Before Processing", False, "No test meeting ID available")
+            return False
+            
+        try:
+            # Create a new meeting that hasn't been processed
+            meeting_data = {"title": "Test Meeting - Q&A Before Processing"}
+            response = self.session.post(f"{BASE_URL}/meetings", json=meeting_data)
+            
+            if response.status_code != 200:
+                self.log_test("Q&A Before Processing", False, "Failed to create test meeting")
+                return False
+                
+            unprocessed_meeting_id = response.json().get('id')
+            
+            # Try to ask a question before processing
+            question_data = {"question": "What were the main topics discussed?"}
+            qa_response = self.session.post(f"{BASE_URL}/meetings/{unprocessed_meeting_id}/ask-question", json=question_data)
+            
+            # Clean up the test meeting
+            self.session.delete(f"{BASE_URL}/meetings/{unprocessed_meeting_id}")
+            
+            if qa_response.status_code == 400:
+                error_data = qa_response.json()
+                if "must be processed" in error_data.get('detail', '').lower():
+                    self.log_test("Q&A Before Processing", True, "Correctly rejected Q&A for unprocessed meeting")
+                    return True
+                else:
+                    self.log_test("Q&A Before Processing", False, f"Wrong error message: {error_data.get('detail')}")
+                    return False
+            else:
+                self.log_test("Q&A Before Processing", False, f"Expected HTTP 400, got {qa_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Q&A Before Processing", False, f"Error: {str(e)}")
+            return False
+
+    def test_qa_nonexistent_meeting(self):
+        """Test Q&A endpoint with non-existent meeting (should fail)"""
+        try:
+            fake_meeting_id = "nonexistent-meeting-id-12345"
+            question_data = {"question": "What were the main topics discussed?"}
+            
+            response = self.session.post(f"{BASE_URL}/meetings/{fake_meeting_id}/ask-question", json=question_data)
+            
+            if response.status_code == 404:
+                error_data = response.json()
+                if "not found" in error_data.get('detail', '').lower():
+                    self.log_test("Q&A Non-existent Meeting", True, "Correctly rejected Q&A for non-existent meeting")
+                    return True
+                else:
+                    self.log_test("Q&A Non-existent Meeting", False, f"Wrong error message: {error_data.get('detail')}")
+                    return False
+            else:
+                self.log_test("Q&A Non-existent Meeting", False, f"Expected HTTP 404, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Q&A Non-existent Meeting", False, f"Error: {str(e)}")
+            return False
+
+    def test_qa_functionality(self):
+        """Test Q&A functionality with processed meeting"""
+        if not self.test_meeting_id:
+            self.log_test("Q&A Functionality", False, "No test meeting ID available")
+            return False
+            
+        try:
+            # First verify the meeting is processed
+            meeting_response = self.session.get(f"{BASE_URL}/meetings/{self.test_meeting_id}")
+            if meeting_response.status_code != 200:
+                self.log_test("Q&A Functionality", False, "Could not retrieve meeting")
+                return False
+                
+            meeting_data = meeting_response.json()
+            if meeting_data.get('status') != 'completed':
+                self.log_test("Q&A Functionality", False, f"Meeting not processed (status: {meeting_data.get('status')})")
+                return False
+            
+            # Test multiple questions
+            test_questions = [
+                "What were the main topics discussed in this meeting?",
+                "What action items were identified?",
+                "Can you summarize the key decisions made?",
+                "What were the key points from this meeting?"
+            ]
+            
+            successful_questions = 0
+            
+            for i, question_text in enumerate(test_questions):
+                question_data = {"question": question_text}
+                response = self.session.post(f"{BASE_URL}/meetings/{self.test_meeting_id}/ask-question", json=question_data)
+                
+                if response.status_code == 200:
+                    qa_data = response.json()
+                    
+                    # Validate response format
+                    required_fields = ['question', 'answer', 'timestamp']
+                    missing_fields = [field for field in required_fields if field not in qa_data]
+                    
+                    if missing_fields:
+                        self.log_test("Q&A Functionality", False, f"Question {i+1}: Missing fields {missing_fields}")
+                        continue
+                    
+                    if qa_data.get('question') != question_text:
+                        self.log_test("Q&A Functionality", False, f"Question {i+1}: Question mismatch")
+                        continue
+                    
+                    if not qa_data.get('answer') or len(qa_data.get('answer', '').strip()) < 10:
+                        self.log_test("Q&A Functionality", False, f"Question {i+1}: Answer too short or empty")
+                        continue
+                    
+                    # Validate timestamp format
+                    timestamp = qa_data.get('timestamp')
+                    if not timestamp:
+                        self.log_test("Q&A Functionality", False, f"Question {i+1}: Missing timestamp")
+                        continue
+                    
+                    successful_questions += 1
+                    print(f"   Q{i+1}: {question_text[:50]}...")
+                    print(f"   A{i+1}: {qa_data.get('answer')[:100]}...")
+                    
+                else:
+                    print(f"   Question {i+1} failed: HTTP {response.status_code}")
+            
+            if successful_questions == len(test_questions):
+                self.log_test("Q&A Functionality", True, f"All {successful_questions} questions answered successfully")
+                return True
+            elif successful_questions > 0:
+                self.log_test("Q&A Functionality", False, f"Only {successful_questions}/{len(test_questions)} questions succeeded")
+                return False
+            else:
+                self.log_test("Q&A Functionality", False, "No questions were answered successfully")
+                return False
+                
+        except Exception as e:
+            self.log_test("Q&A Functionality", False, f"Error: {str(e)}")
+            return False
+
+    def test_qa_storage_verification(self):
+        """Test that Q&A entries are properly stored in the database"""
+        if not self.test_meeting_id:
+            self.log_test("Q&A Storage Verification", False, "No test meeting ID available")
+            return False
+            
+        try:
+            # Ask a specific question
+            test_question = "What is the main purpose of this meeting?"
+            question_data = {"question": test_question}
+            
+            response = self.session.post(f"{BASE_URL}/meetings/{self.test_meeting_id}/ask-question", json=question_data)
+            
+            if response.status_code != 200:
+                self.log_test("Q&A Storage Verification", False, f"Failed to ask question: HTTP {response.status_code}")
+                return False
+            
+            qa_response = response.json()
+            
+            # Retrieve the meeting and check if Q&A is stored
+            meeting_response = self.session.get(f"{BASE_URL}/meetings/{self.test_meeting_id}")
+            
+            if meeting_response.status_code != 200:
+                self.log_test("Q&A Storage Verification", False, "Failed to retrieve meeting")
+                return False
+            
+            meeting_data = meeting_response.json()
+            questions_answers = meeting_data.get('questions_answers', [])
+            
+            if not questions_answers:
+                self.log_test("Q&A Storage Verification", False, "No Q&A entries found in meeting")
+                return False
+            
+            # Find our specific question
+            found_qa = None
+            for qa in questions_answers:
+                if qa.get('question') == test_question:
+                    found_qa = qa
+                    break
+            
+            if not found_qa:
+                self.log_test("Q&A Storage Verification", False, f"Question '{test_question}' not found in stored Q&A")
+                return False
+            
+            # Verify the stored Q&A matches the response
+            if found_qa.get('answer') != qa_response.get('answer'):
+                self.log_test("Q&A Storage Verification", False, "Stored answer doesn't match response")
+                return False
+            
+            # Verify all Q&A entries have required fields
+            for i, qa in enumerate(questions_answers):
+                required_fields = ['question', 'answer', 'timestamp']
+                missing_fields = [field for field in required_fields if field not in qa]
+                
+                if missing_fields:
+                    self.log_test("Q&A Storage Verification", False, f"Q&A entry {i+1} missing fields: {missing_fields}")
+                    return False
+            
+            self.log_test("Q&A Storage Verification", True, f"Q&A properly stored. Total entries: {len(questions_answers)}")
+            return True
+            
+        except Exception as e:
+            self.log_test("Q&A Storage Verification", False, f"Error: {str(e)}")
+            return False
+
+    def test_qa_integration_workflow(self):
+        """Test complete Q&A integration workflow"""
+        try:
+            # Create a new meeting for integration test
+            meeting_data = {"title": "Integration Test Meeting - Q&A Workflow"}
+            response = self.session.post(f"{BASE_URL}/meetings", json=meeting_data)
+            
+            if response.status_code != 200:
+                self.log_test("Q&A Integration Workflow", False, "Failed to create integration test meeting")
+                return False
+            
+            integration_meeting_id = response.json().get('id')
+            
+            try:
+                # Upload audio
+                audio_file_path = self.create_test_audio_file()
+                
+                with open(audio_file_path, 'rb') as audio_file:
+                    files = {'audio_file': ('integration_test.wav', audio_file, 'audio/wav')}
+                    upload_response = self.session.post(f"{BASE_URL}/meetings/{integration_meeting_id}/upload-audio", files=files)
+                
+                os.unlink(audio_file_path)
+                
+                if upload_response.status_code != 200:
+                    self.log_test("Q&A Integration Workflow", False, "Failed to upload audio for integration test")
+                    return False
+                
+                # Process with AI
+                process_response = self.session.post(f"{BASE_URL}/meetings/{integration_meeting_id}/process")
+                
+                if process_response.status_code != 200:
+                    self.log_test("Q&A Integration Workflow", False, "Failed to start AI processing for integration test")
+                    return False
+                
+                # Wait for processing to complete
+                max_wait_time = 120
+                wait_interval = 5
+                elapsed_time = 0
+                
+                print("   Waiting for AI processing to complete for integration test...")
+                
+                while elapsed_time < max_wait_time:
+                    time.sleep(wait_interval)
+                    elapsed_time += wait_interval
+                    
+                    meeting_response = self.session.get(f"{BASE_URL}/meetings/{integration_meeting_id}")
+                    if meeting_response.status_code == 200:
+                        meeting_data = meeting_response.json()
+                        status = meeting_data.get('status')
+                        
+                        if status == 'completed':
+                            # Now test Q&A on the processed meeting
+                            question_data = {"question": "What can you tell me about this meeting?"}
+                            qa_response = self.session.post(f"{BASE_URL}/meetings/{integration_meeting_id}/ask-question", json=question_data)
+                            
+                            if qa_response.status_code == 200:
+                                qa_data = qa_response.json()
+                                
+                                # Verify the Q&A response uses meeting context
+                                answer = qa_data.get('answer', '').lower()
+                                meeting_context_indicators = ['meeting', 'transcript', 'summary', 'discussed']
+                                
+                                has_context = any(indicator in answer for indicator in meeting_context_indicators)
+                                
+                                if has_context:
+                                    self.log_test("Q&A Integration Workflow", True, "Complete workflow successful: create → upload → process → Q&A")
+                                    return True
+                                else:
+                                    self.log_test("Q&A Integration Workflow", False, "Q&A answer doesn't seem to use meeting context")
+                                    return False
+                            else:
+                                self.log_test("Q&A Integration Workflow", False, f"Q&A failed: HTTP {qa_response.status_code}")
+                                return False
+                        
+                        elif status == 'error':
+                            self.log_test("Q&A Integration Workflow", False, "AI processing failed for integration test")
+                            return False
+                
+                self.log_test("Q&A Integration Workflow", False, "AI processing timed out for integration test")
+                return False
+                
+            finally:
+                # Clean up integration test meeting
+                self.session.delete(f"{BASE_URL}/meetings/{integration_meeting_id}")
+                
+        except Exception as e:
+            self.log_test("Q&A Integration Workflow", False, f"Error: {str(e)}")
+            return False
+
     def test_delete_meeting(self):
         """Test meeting deletion endpoint"""
         if not self.test_meeting_id:
