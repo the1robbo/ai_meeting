@@ -42,6 +42,7 @@ interface Meeting {
 export default function MeetingDetails() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [meeting, setMeeting] = useState<Meeting | null>(null);
   const [loading, setLoading] = useState(true);
   const [question, setQuestion] = useState('');
