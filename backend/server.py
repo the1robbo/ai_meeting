@@ -186,15 +186,11 @@ async def process_meeting(meeting_id: str):
         raise HTTPException(status_code=500, detail=f"Error processing meeting: {str(e)}")
 
 async def process_audio_with_ai(meeting_id: str, audio_file_path: str):
-    """Background task to process audio with AI"""
+    """Background task to process audio with AI including speaker diarization"""
     try:
         logger.info(f"Starting AI processing for meeting {meeting_id}")
         
-        # For audio transcription, we need to use a different approach since file attachments
-        # with Whisper aren't supported in the current emergentintegrations version
-        # Let's use OpenAI directly for transcription
-        
-        # First, let's use Gemini for file processing since it supports file attachments
+        # First, let's use Gemini for transcription (it supports audio files)
         transcription_chat = LlmChat(
             api_key=os.environ['EMERGENT_LLM_KEY'],
             session_id=f"transcribe_{meeting_id}",
@@ -215,7 +211,41 @@ async def process_audio_with_ai(meeting_id: str, audio_file_path: str):
         )
         
         transcription_response = await transcription_chat.send_message(transcription_message)
-        transcript = transcription_response.strip()
+        raw_transcript = transcription_response.strip()
+        
+        # Now perform speaker diarization using AI analysis
+        logger.info(f"Performing speaker diarization for meeting {meeting_id}")
+        diarization_chat = LlmChat(
+            api_key=os.environ['EMERGENT_LLM_KEY'],
+            session_id=f"diarize_{meeting_id}",
+            system_message="""You are a speaker diarization expert. Analyze the transcript and identify different speakers based on:
+1. Speaking patterns and style changes
+2. Topic transitions that suggest speaker changes
+3. Conversational cues like responses, questions, and interruptions
+4. Natural speech flow patterns
+
+Format the output with speaker labels like:
+Person 1: [their speech]
+Person 2: [their speech]
+Person 1: [their speech continues]
+
+If you cannot clearly identify speaker changes, use your best judgment based on natural conversation flow."""
+        ).with_model("openai", "gpt-4o")
+        
+        diarization_prompt = f"""
+        Please analyze this meeting transcript and identify different speakers. Add speaker labels (Person 1, Person 2, etc.) to create a diarized transcript.
+
+        Look for natural conversation patterns, topic changes, questions and responses, and speaking style differences to identify when different people are speaking.
+
+        Original Transcript:
+        {raw_transcript}
+
+        Please return the diarized transcript with clear speaker labels:
+        """
+        
+        diarization_message = UserMessage(text=diarization_prompt)
+        diarized_transcript = await diarization_chat.send_message(diarization_message)
+        transcript = diarized_transcript.strip()
         
         # Initialize LLM chat for summarization
         summary_chat = LlmChat(
