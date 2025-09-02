@@ -189,9 +189,15 @@ async def process_meeting(meeting_id: str):
         raise HTTPException(status_code=500, detail=f"Error processing meeting: {str(e)}")
 
 async def process_audio_with_ai(meeting_id: str, audio_file_path: str):
-    """Background task to process audio with AI including speaker diarization"""
+    """Background task to process audio with AI including speaker diarization and progress tracking"""
     try:
         logger.info(f"Starting AI processing for meeting {meeting_id}")
+        
+        # Stage 1: Starting transcription (25% progress)
+        await db.meetings.update_one(
+            {"id": meeting_id},
+            {"$set": {"processing_progress": 25, "processing_stage": "transcribing"}}
+        )
         
         # First, let's use Gemini for transcription (it supports audio files)
         transcription_chat = LlmChat(
@@ -215,6 +221,12 @@ async def process_audio_with_ai(meeting_id: str, audio_file_path: str):
         
         transcription_response = await transcription_chat.send_message(transcription_message)
         raw_transcript = transcription_response.strip()
+        
+        # Stage 2: Transcription completed, starting speaker diarization (50% progress)
+        await db.meetings.update_one(
+            {"id": meeting_id},
+            {"$set": {"processing_progress": 50, "processing_stage": "diarizing"}}
+        )
         
         # Now perform speaker diarization using AI analysis
         logger.info(f"Performing speaker diarization for meeting {meeting_id}")
@@ -249,6 +261,12 @@ If you cannot clearly identify speaker changes, use your best judgment based on 
         diarization_message = UserMessage(text=diarization_prompt)
         diarized_transcript = await diarization_chat.send_message(diarization_message)
         transcript = diarized_transcript.strip()
+        
+        # Stage 3: Diarization completed, starting summarization (75% progress)
+        await db.meetings.update_one(
+            {"id": meeting_id},
+            {"$set": {"processing_progress": 75, "processing_stage": "summarizing"}}
+        )
         
         # Initialize LLM chat for summarization using the diarized transcript
         summary_chat = LlmChat(
@@ -309,7 +327,7 @@ If you cannot clearly identify speaker changes, use your best judgment based on 
             key_points = []
             action_items = []
         
-        # Update meeting with results - store both raw and diarized transcripts
+        # Stage 4: Processing completed (100% progress)
         await db.meetings.update_one(
             {"id": meeting_id},
             {
@@ -319,6 +337,8 @@ If you cannot clearly identify speaker changes, use your best judgment based on 
                     "summary": summary_text,
                     "key_points": key_points,
                     "action_items": action_items,
+                    "processing_progress": 100,
+                    "processing_stage": "completed",
                     "processed_at": datetime.utcnow(),
                     "status": "completed"
                 }
@@ -331,7 +351,7 @@ If you cannot clearly identify speaker changes, use your best judgment based on 
         logger.error(f"Error in AI processing for meeting {meeting_id}: {str(e)}")
         await db.meetings.update_one(
             {"id": meeting_id},
-            {"$set": {"status": "error"}}
+            {"$set": {"status": "error", "processing_progress": 0, "processing_stage": "error"}}
         )
 
 @api_router.put("/meetings/{meeting_id}")
