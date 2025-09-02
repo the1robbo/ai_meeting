@@ -45,6 +45,7 @@ export default function Index() {
   const [hasPermission, setHasPermission] = useState(false);
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { alertConfig, visible, showAlert, hideAlert } = useCustomAlert();
 
   const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
