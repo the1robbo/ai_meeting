@@ -172,23 +172,27 @@ async def process_audio_with_ai(meeting_id: str, audio_file_path: str):
     try:
         logger.info(f"Starting AI processing for meeting {meeting_id}")
         
-        # Initialize LLM chat for Whisper (transcription)
+        # For audio transcription, we need to use a different approach since file attachments
+        # with Whisper aren't supported in the current emergentintegrations version
+        # Let's use OpenAI directly for transcription
+        
+        # First, let's use Gemini for file processing since it supports file attachments
         transcription_chat = LlmChat(
             api_key=os.environ['EMERGENT_LLM_KEY'],
             session_id=f"transcribe_{meeting_id}",
-            system_message="You are a transcription assistant. Convert the audio to accurate text."
-        ).with_model("openai", "whisper-1")
+            system_message="You are a transcription assistant. Listen to the audio and convert it to accurate text. Please transcribe exactly what you hear."
+        ).with_model("gemini", "gemini-2.0-flash")
         
-        # Create file content for Whisper
+        # Create file content for audio transcription
         audio_file = FileContentWithMimeType(
             file_path=audio_file_path,
             mime_type="audio/wav"  # Adjust based on actual file type
         )
         
-        # Transcribe audio
+        # Transcribe audio using Gemini
         logger.info(f"Transcribing audio for meeting {meeting_id}")
         transcription_message = UserMessage(
-            text="Please transcribe this audio file accurately.",
+            text="Please transcribe this audio file accurately. Return only the transcribed text without any additional formatting or explanations.",
             file_contents=[audio_file]
         )
         
