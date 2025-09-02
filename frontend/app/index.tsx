@@ -510,6 +510,17 @@ export default function Index() {
           </View>
         </>
       )}
+
+      {/* Custom Alert Modal */}
+      {alertConfig && (
+        <CustomAlert
+          visible={visible}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          buttons={alertConfig.buttons}
+          onClose={hideAlert}
+        />
+      )}
     </View>
   );
 }
