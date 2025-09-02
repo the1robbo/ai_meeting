@@ -30,6 +30,8 @@ interface Meeting {
   summary?: string;
   key_points?: string[];
   action_items?: string[];
+  processing_progress?: number;  // Progress percentage (0-100)
+  processing_stage?: string;     // idle, transcribing, diarizing, summarizing, completed
   created_at: string;
   processed_at?: string;
   status: 'recording' | 'uploaded' | 'processing' | 'completed' | 'error';
