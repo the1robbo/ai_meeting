@@ -64,6 +64,9 @@ class MeetingRecording(BaseModel):
 class MeetingCreate(BaseModel):
     title: str
 
+class QuestionCreate(BaseModel):
+    question: str
+
 class ProcessingResponse(BaseModel):
     meeting_id: str
     status: str
