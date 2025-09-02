@@ -290,7 +290,7 @@ export default function Index() {
   };
 
   const deleteMeeting = async (meetingId: string, meetingTitle: string) => {
-    Alert.alert(
+    showAlert(
       'Delete Meeting',
       `Are you sure you want to delete "${meetingTitle}"? This action cannot be undone.`,
       [
@@ -317,13 +317,13 @@ export default function Index() {
                 const updatedMeetings = meetings.filter(meeting => meeting.id !== meetingId);
                 await AsyncStorage.setItem('meetings', JSON.stringify(updatedMeetings));
                 
-                Alert.alert('Success', 'Meeting deleted successfully');
+                showAlert('Success', 'Meeting deleted successfully');
               } else {
-                Alert.alert('Error', 'Failed to delete meeting');
+                showAlert('Error', 'Failed to delete meeting');
               }
             } catch (error) {
               console.error('Error deleting meeting:', error);
-              Alert.alert('Error', 'Failed to delete meeting');
+              showAlert('Error', 'Failed to delete meeting');
             }
           },
         },
