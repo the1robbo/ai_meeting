@@ -37,6 +37,8 @@ interface Meeting {
 export default function Index() {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
@@ -44,6 +46,17 @@ export default function Index() {
   const insets = useSafeAreaInsets();
 
   const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+
+  // Timer for recording duration
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isRecording && !isPaused) {
+      interval = setInterval(() => {
+        setRecordingDuration(prev => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isRecording, isPaused]);
 
   useEffect(() => {
     requestPermissions();
