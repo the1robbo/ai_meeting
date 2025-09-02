@@ -50,9 +50,11 @@ export default function Index() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
   const [appState, setAppState] = useState(AppState.currentState);
+  const [showThemeSelector, setShowThemeSelector] = useState(false);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { alertConfig, visible, showAlert, hideAlert } = useCustomAlert();
+  const { theme, isDark } = useTheme();
 
   const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
