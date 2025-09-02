@@ -239,12 +239,11 @@ export default function Index() {
       style={styles.meetingItem}
       onPress={() => {
         if (item.status === 'completed') {
-          // Navigate to meeting details (you can implement this)
-          Alert.alert(
-            item.title,
-            `Summary: ${item.summary}\n\nKey Points: ${item.key_points?.join(', ')}\n\nAction Items: ${item.action_items?.join(', ')}`,
-            [{ text: 'OK' }]
-          );
+          router.push(`/meeting/${item.id}`);
+        } else if (item.status === 'processing') {
+          Alert.alert('Processing', 'This meeting is still being processed. Please wait...');
+        } else {
+          Alert.alert('Not Ready', 'This meeting hasn\'t been processed yet.');
         }
       }}
     >
@@ -261,6 +260,12 @@ export default function Index() {
         <View style={styles.processingIndicator}>
           <ActivityIndicator size="small" color="#007AFF" />
           <Text style={styles.processingText}>Processing...</Text>
+        </View>
+      )}
+      {item.status === 'completed' && (
+        <View style={styles.completedIndicator}>
+          <Ionicons name="chevron-forward" size={16} color="#8E8E93" />
+          <Text style={styles.tapToViewText}>Tap to view & ask questions</Text>
         </View>
       )}
     </TouchableOpacity>
