@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Platform,
   Animated,
+  AppState,
 } from 'react-native';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
@@ -17,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Swipeable } from 'react-native-gesture-handler';
+import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 import CustomAlert from '../components/CustomAlert';
 import { useCustomAlert } from '../hooks/useCustomAlert';
 
