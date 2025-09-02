@@ -456,6 +456,16 @@ const styles = StyleSheet.create({
     color: '#FF9500',
     marginLeft: 8,
   },
+  completedIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  tapToViewText: {
+    fontSize: 14,
+    color: '#8E8E93',
+    marginLeft: 4,
+  },
   emptyText: {
     fontSize: 16,
     color: '#8E8E93',
