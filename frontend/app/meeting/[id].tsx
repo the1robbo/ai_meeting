@@ -30,6 +30,7 @@ interface Meeting {
   participants?: string[];
   meeting_date?: string;
   transcript?: string;
+  raw_transcript?: string;  // Original transcript before diarization
   summary?: string;
   key_points?: string[];
   action_items?: string[];
